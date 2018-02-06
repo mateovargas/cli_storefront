@@ -1,0 +1,23 @@
+{
+  "name": "cli_storefront",
+  "version": "1.0.0",
+  "description": "A command-line interface storefront application using Node and MySQL",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mateovargas/cli_storefront.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mateovargas/cli_storefront/issues"
+  },
+  "homepage": "https://github.com/mateovargas/cli_storefront#readme",
+  "dependencies": {
+    "inquirer": "^5.1.0",
+    "mysql": "^2.15.0"
+  }
+}
