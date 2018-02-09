@@ -203,7 +203,7 @@ function purchase(){
                     if (err) throw err;
                 });
             }
-
+            console.log('Thank you for shopping at bamazon!');
             connection.end();
         }
     });
