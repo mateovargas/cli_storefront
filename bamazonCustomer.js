@@ -4,7 +4,7 @@
 var mysql = require('mysql');
 var inquirer = require('inquirer');
 var cart = [];
-var keep_shopping = false;
+var keepShopping = false;
 
 //mysql connection
 var connection = mysql.createConnection({
@@ -36,7 +36,7 @@ connection.connect(function (err) {
 //their cart, or proceed to purchase.
 function shop(){
 
-    
+    //Prompt to ask user what they want and how many
     inquirer.prompt([
         {
             type: 'input',
@@ -50,12 +50,14 @@ function shop(){
         }
     ]).then(function(inquirerResponse){
 
+        //Takes input and then uses it in the search.
         var query_product = inquirerResponse.product.toString();
         var query_quantity = parseInt(inquirerResponse.quantity);
 
         var query = connection.query("SELECT * FROM products WHERE product_name=?", 
                                     [query_product], function (err, res) {
                                         
+                                        //Returns if the product is not in database.
                                         if(res.length === 0){
 
                                             console.log('Sorry! That product is out of stock.');
@@ -63,6 +65,7 @@ function shop(){
 
                                         }
 
+                                        //Displays the item chosen.
                                         for(var i = 0; i < res.length; i++){
 
                                             var order_cost = res[i].price * query_quantity;
@@ -73,6 +76,8 @@ function shop(){
                                                         order_cost.toString() + '.');
                                         }
 
+                                        //Prompts user to confirm and see if they need to
+                                        //add more.
                                         inquirer.prompt([
                                             {
                                                 type: 'confirm',
@@ -85,8 +90,9 @@ function shop(){
                                                 name: 'confirm'
                                             }
                                         ]).then(function (inquirerResponse) {
-
-                                            keep_shopping = inquirerResponse.confirm;
+                                            
+                                            //Sets global flag for keep_shopping
+                                            keepShopping = inquirerResponse.confirm;
 
                                             if (inquirerResponse.add_to_cart) {
 
@@ -119,6 +125,7 @@ function addToCart(item, quantity){
                 var product_name = res[i].product_name;
                 var product_price = res[i].price;
 
+                //Adds items to cart if quantity is available.
                 if(quantity <= res[i].stock_quantity){
 
                     cart.push({
@@ -136,7 +143,7 @@ function addToCart(item, quantity){
         }
 
 
-        if(!keep_shopping){
+        if(!keepShopping){
 
             purchase();
 
@@ -145,6 +152,8 @@ function addToCart(item, quantity){
 
 };
 
+//Function that displays the cart and then proceeds to purchase it if
+//confirmed.
 function purchase(){
 
     var total = 0;
