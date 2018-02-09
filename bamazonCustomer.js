@@ -27,7 +27,6 @@ connection.connect(function (err) {
     console.log("Welcome to bamazon! Jeff Bezo's worst nightmare!");
     shop();
 
-    //connection.end();
 });
 
 //Function that runs the shopping platform. Queries users for produc to search
@@ -54,7 +53,8 @@ function shop(){
         var query_product = inquirerResponse.product.toString();
         var query_quantity = parseInt(inquirerResponse.quantity);
 
-        var query = connection.query("SELECT * FROM products WHERE product_name=?", [query_product], function (err, res) {
+        var query = connection.query("SELECT * FROM products WHERE product_name=?", 
+                                    [query_product], function (err, res) {
                                         
                                         if(res.length === 0){
 
@@ -112,7 +112,8 @@ function shop(){
 //a JSON object with product name being the key and the quantity needed being the key
 function addToCart(item, quantity){
 
-    var query = connection.query("SELECT * FROM products WHERE product_name=?", [item], function (err, res) {
+    var query = connection.query("SELECT * FROM products WHERE product_name=?", 
+                                [item], function (err, res) {
         for (var i = 0; i < res.length; i++) {
 
                 var product_name = res[i].product_name;
@@ -120,11 +121,11 @@ function addToCart(item, quantity){
 
                 if(quantity <= res[i].stock_quantity){
 
-                    console.log('Can purchase');
                     cart.push({
                                 name: product_name,
                                 quantity: quantity,
-                                price: product_price
+                                price: product_price,
+                                quantity_available: res[i].stock_quantity
                               });
                 }
                 else{
@@ -147,5 +148,57 @@ function addToCart(item, quantity){
 function purchase(){
 
     console.log(cart);
+    var total = 0;
+    
+    for(var i = 0; i < cart.length; i++){
+        
+        var total = total + (cart[i].quantity * cart[i].price);
+        console.log('----------');
+        console.log(cart[i].quantity.toString() + ' | ' + 
+                    cart[i].name + ' | ' + cart[i].price.toString());
+
+    }
+
+    console.log('----------');
+    console.log('TOTAL: $' + total);
+
+    inquirer.prompt([
+        {
+            type: 'confirm',
+            message: 'Does this look correct?',
+            name: 'correct'
+        },
+        {
+            type: 'confirm',
+            message: 'Confirm purchase?',
+            name: 'purchase'
+        }
+    ]).then(function(inquirerResponse){
+
+        if(!inquirerResponse.correct){
+
+            console.log('Restarting shopping! Sorry about that.');
+            cart = [];
+            shop();
+
+        }
+
+        console.log(cart);
+
+        if(inquirerResponse.purchase){
+
+            for(var i = 0; i < cart.length; i++){
+
+                var new_stock = cart[i].quantity_available - cart[i].quantity;
+                var name = cart[i].name;
+                connection.query("UPDATE products SET stock_quantity=? WHERE product_name=?", 
+                                 [new_stock, name], 
+                                 function(err, res, fields){
+                    if (err) throw err;
+                    console.log('Updating: ' + name);
+                });
+            }
+        }
+    });
 
 }
