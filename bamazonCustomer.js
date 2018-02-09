@@ -147,7 +147,6 @@ function addToCart(item, quantity){
 
 function purchase(){
 
-    console.log(cart);
     var total = 0;
     
     for(var i = 0; i < cart.length; i++){
@@ -183,8 +182,6 @@ function purchase(){
 
         }
 
-        console.log(cart);
-
         if(inquirerResponse.purchase){
 
             for(var i = 0; i < cart.length; i++){
@@ -195,9 +192,10 @@ function purchase(){
                                  [new_stock, name], 
                                  function(err, res, fields){
                     if (err) throw err;
-                    console.log('Updating: ' + name);
                 });
             }
+
+            connection.end();
         }
     });
 
